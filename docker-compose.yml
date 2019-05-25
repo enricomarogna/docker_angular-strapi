@@ -1,0 +1,43 @@
+version: '3'
+
+services:
+  api:
+    build: _strapi
+    image: strapi/strapi
+    environment:
+      - APP_NAME=strapi-app
+      - DATABASE_CLIENT=mongo
+      - DATABASE_HOST=db
+      - DATABASE_PORT=27017
+      - DATABASE_NAME=strapi
+      - DATABASE_USERNAME=
+      - DATABASE_PASSWORD=
+      - DATABASE_SSL=false
+      - DATABASE_AUTHENTICATION_DATABASE=strapi
+      - HOST=localhost
+    ports:
+      - 1337:1337
+    volumes:
+      - ./_strapi/_api:/usr/src/api/strapi-app
+      #- /usr/src/api/strapi-app/node_modules
+    depends_on:
+      - db
+    restart: always
+
+  db:
+    image: mongo
+    environment:
+      - MONGO_INITDB_DATABASE=strapi
+    ports:
+      - 27017:27017
+    volumes:
+      - ./_strapi/_db:/data/db
+    restart: always
+
+  angular: # name of the first service
+    build: _angular # specify the directory of the Dockerfile
+    ports:
+      - 4200:4200 # specify port forewarding
+    volumes:
+      - ./_angular/angular-app:/app # this will enable changes made to the angular app reflect in the container
+      - /app/node_modules/
